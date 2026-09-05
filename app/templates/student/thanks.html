@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Thank you{% endblock %}
+{% block body_class %}page-phone{% endblock %}
+{% block body %}
+<main class="phone">
+  <h1>Finished</h1>
+  <p class="lede">{{ qset.thanks_message }}</p>
+</main>
+{% endblock %}

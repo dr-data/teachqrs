@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Join {{ session.join_code }}{% endblock %}
+{% block body_class %}page-phone{% endblock %}
+{% block body %}
+<main class="phone">
+  <p class="eyebrow">{{ session.join_code }} · {{ qset.title }}</p>
+  <h1>Before you answer</h1>
+  <p class="lede">{{ qset.welcome_message }}</p>
+  {% if session.status != 'live' %}
+    <p class="flash bad">This session is not live.</p>
+  {% else %}
+  {% if flash %}<p class="flash {% if flash.e %}bad{% endif %}">{{ flash.m }}</p>{% endif %}
+  <form method="post" action="/j/{{ session.join_code }}/join" class="stack">
+    <label>Student number
+      <input name="student_number" required minlength="3" maxlength="20" autocomplete="username" autocapitalize="off" placeholder="e.g. 3035123456">
+    </label>
+    {% if subclasses|length == 1 %}
+      <input type="hidden" name="subclass_id" value="{{ subclasses[0].id }}">
+      <p class="hint">You will be recorded in subclass <strong>{{ subclasses[0].code }}</strong>.</p>
+    {% else %}
+      <fieldset>
+        <legend>Subclass</legend>
+        {% for sc in subclasses %}
+        <label class="check"><input type="radio" name="subclass_id" value="{{ sc.id }}" required> {{ sc.code }} — {{ sc.name }}</label>
+        {% endfor %}
+      </fieldset>
+    {% endif %}
+    <button type="submit">Continue to questions</button>
+  </form>
+  {% endif %}
+</main>
+{% endblock %}

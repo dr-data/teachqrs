@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Set password{% endblock %}
+{% block body %}
+<main class="shell narrow">
+  <p class="eyebrow">First run</p>
+  <h1>Protect this classroom</h1>
+  <p class="lede">Set a teacher password stored only on this machine. Students never see it.</p>
+  {% if flash %}<p class="flash {% if flash.e %}bad{% endif %}">{{ flash.m }}</p>{% endif %}
+  <form method="post" action="/teacher/setup" class="stack">
+    <label>Password <input type="password" name="password" minlength="6" required></label>
+    <label>Confirm <input type="password" name="confirm" minlength="6" required></label>
+    <button type="submit">Create teacher login</button>
+  </form>
+</main>
+{% endblock %}

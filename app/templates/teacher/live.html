@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Live {{ session.join_code }}{% endblock %}
+{% block body_class %}page-live{% endblock %}
+{% block body %}
+<header class="live-bar">
+  <span class="pill {% if session.status == 'live' %}on{% endif %}">{{ session.status }}</span>
+  <strong>{{ session.name }}</strong>
+  <span>round {{ session.current_round }}</span>
+  <a href="/teacher">Dashboard</a>
+  <a href="/teacher/sessions/{{ session.id }}/export.csv">Export CSV</a>
+</header>
+
+<div class="live-grid" data-session="{{ session.id }}" data-mode="{{ session.mode }}">
+  <aside class="join-panel">
+    <p class="eyebrow">Students join</p>
+    <p class="join-code">{{ session.join_code }}</p>
+    <img class="qr" alt="Join QR code" src="/live/{{ session.id }}/qr.png">
+    <p class="join-url">{{ join_url }}</p>
+    <p class="counts"><span id="joined">0</span> joined · <span id="answered">0</span> answered</p>
+    <div class="filters" id="filters">
+      <button type="button" class="chip on" data-subclass="">All</button>
+      {% for sc in subclasses %}
+      <button type="button" class="chip" data-subclass="{{ sc.id }}">{{ sc.code }}</button>
+      {% endfor %}
+    </div>
+  </aside>
+
+  <section class="stage">
+    <p class="eyebrow" id="qmeta">Question</p>
+    <h1 id="prompt">Waiting…</h1>
+    <div id="bars" class="bars"></div>
+    {% if session.mode == 'interactive' and session.status == 'live' %}
+    <div class="controls">
+      <form method="post" action="/live/{{ session.id }}/open"><button>Open answers</button></form>
+      <form method="post" action="/live/{{ session.id }}/close-question"><button class="secondary">Close &amp; reveal</button></form>
+      <form method="post" action="/live/{{ session.id }}/reopen"><button class="secondary">Reopen for discussion</button></form>
+      <form method="post" action="/live/{{ session.id }}/next"><input type="hidden" name="direction" value="prev"><button class="secondary">Previous</button></form>
+      <form method="post" action="/live/{{ session.id }}/next"><input type="hidden" name="direction" value="next"><button class="secondary">Next</button></form>
+    </div>
+    {% endif %}
+    {% if session.status == 'live' %}
+    <form method="post" action="/live/{{ session.id }}/close" class="end"><button class="danger">End session</button></form>
+    {% else %}
+    <p class="hint">Session closed. Export the CSV from the header.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/poll.js"></script>
+{% endblock %}

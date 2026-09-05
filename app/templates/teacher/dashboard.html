@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Teacher dashboard{% endblock %}
+{% block body_class %}page-admin{% endblock %}
+{% block body %}
+<header class="topbar">
+  <strong>TeachQRS</strong>
+  <form method="post" action="/teacher/logout"><button class="text">Sign out</button></form>
+</header>
+<main class="admin">
+  {% if flash %}<p class="flash {% if flash.e %}bad{% endif %}">{{ flash.m }}</p>{% endif %}
+
+  <section>
+    <h1>Start a live session</h1>
+    <p class="hint">One question set, one or more subclasses. Students enter a student number, then answer the same items.</p>
+    {% if not sets or not subclasses %}
+      <p class="hint">Add at least one subclass and one question set first.</p>
+    {% else %}
+    <form method="post" action="/teacher/sessions" class="grid-form">
+      <label>Session name <input name="name" placeholder="Lecture 4 — energy" required></label>
+      <label>Question set
+        <select name="set_id" required>
+          {% for s in sets %}<option value="{{ s.id }}">{{ s.title }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>Mode
+        <select name="mode">
+          <option value="interactive">Interactive (one question at a time)</option>
+          <option value="survey">Survey (all questions at once)</option>
+        </select>
+      </label>
+      <fieldset>
+        <legend>Subclasses that may join</legend>
+        {% for sc in subclasses %}
+          <label class="check"><input type="checkbox" name="subclass_ids" value="{{ sc.id }}" {% if loop.first %}checked{% endif %}> {{ sc.code }} — {{ sc.name }}</label>
+        {% endfor %}
+      </fieldset>
+      <button type="submit">Start live session</button>
+    </form>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>Subclasses</h2>
+    <form method="post" action="/teacher/subclasses" class="row-form">
+      <input name="code" placeholder="T01" required maxlength="12">
+      <input name="name" placeholder="Tutorial 01" required>
+      <button type="submit">Add</button>
+    </form>
+    <ul class="plain">
+      {% for sc in subclasses %}
+      <li>
+        <span>{{ sc.code }} — {{ sc.name }}</span>
+        <form method="post" action="/teacher/subclasses/{{ sc.id }}/delete"><button class="text danger">Remove</button></form>
+      </li>
+      {% else %}
+      <li>None yet. Add T01 / T02 so the same quiz can be filtered by group.</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section>
+    <h2>Question sets</h2>
+    <form method="post" action="/teacher/sets" class="row-form">
+      <input name="title" placeholder="Week 3 conceptual check" required>
+      <select name="mode">
+        <option value="interactive">Interactive</option>
+        <option value="survey">Survey</option>
+      </select>
+      <button type="submit">Create set</button>
+    </form>
+    <ul class="plain">
+      {% for s in sets %}
+      <li><a href="/teacher/sets/{{ s.id }}">{{ s.title }}</a> <em>{{ s.mode }}</em></li>
+      {% else %}
+      <li>No sets yet. Create one, then import a CSV or Excel file.</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section>
+    <h2>Recent sessions</h2>
+    <ul class="plain">
+      {% for s in sessions %}
+      <li>
+        <a href="/live/{{ s.id }}">{{ s.name }}</a>
+        <code>{{ s.join_code }}</code>
+        <em>{{ s.status }}</em>
+        · {{ s.set_title }}
+        <a href="/teacher/sessions/{{ s.id }}/export.csv">Export responses CSV</a>
+      </li>
+      {% else %}
+      <li>No sessions yet.</li>
+      {% endfor %}
+    </ul>
+  </section>
+</main>
+{% endblock %}

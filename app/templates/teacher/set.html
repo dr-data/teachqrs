@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}{{ qset.title }}{% endblock %}
+{% block body_class %}page-admin{% endblock %}
+{% block body %}
+<header class="topbar">
+  <a href="/teacher">Dashboard</a>
+  <strong>{{ qset.title }}</strong>
+</header>
+<main class="admin">
+  {% if flash %}<p class="flash {% if flash.e %}bad{% endif %}">{{ flash.m }}</p>{% endif %}
+
+  <section>
+    <h1>Question set</h1>
+    <form method="post" action="/teacher/sets/{{ qset.id }}" class="stack">
+      <label>Title <input name="title" value="{{ qset.title }}" required></label>
+      <label>Mode
+        <select name="mode">
+          <option value="interactive" {% if qset.mode == 'interactive' %}selected{% endif %}>Interactive</option>
+          <option value="survey" {% if qset.mode == 'survey' %}selected{% endif %}>Survey</option>
+        </select>
+      </label>
+      <label>Welcome message <textarea name="welcome_message" rows="2">{{ qset.welcome_message }}</textarea></label>
+      <label>Thank-you message <textarea name="thanks_message" rows="2">{{ qset.thanks_message }}</textarea></label>
+      <button type="submit">Save set</button>
+    </form>
+    <p class="row-links">
+      <a href="/teacher/sets/{{ qset.id }}/export.csv">Export CSV</a>
+      <a href="/teacher/sets/{{ qset.id }}/export.xlsx">Export Excel</a>
+      <a href="/teacher/sets/template.csv">Download import template</a>
+    </p>
+  </section>
+
+  <section>
+    <h2>Import questions</h2>
+    <p class="hint">CSV or Excel with header: question_number, prompt, type, choice_a…e, correct, points. Type is mcq, true_false, or short. Leave correct blank for an ungraded survey item.</p>
+    <form method="post" action="/teacher/sets/{{ qset.id }}/import" enctype="multipart/form-data" class="row-form">
+      <input type="file" name="file" accept=".csv,.xlsx,.xls" required>
+      <button type="submit">Import</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>Questions</h2>
+    <ol class="questions">
+      {% for q in questions %}
+      <li class="{% if not q.visible %}dim{% endif %}">
+        <p><strong>Q{{ q.position }}</strong> · {{ q.type }}{% if q.correct %} · key {{ q.correct }}{% endif %}{% if not q.visible %} · hidden{% endif %}</p>
+        <p>{{ q.prompt }}</p>
+        {% if q.choices %}
+        <ul>{% for c in q.choices %}<li>{{ "ABCDE"[loop.index0] }}. {{ c }}</li>{% endfor %}</ul>
+        {% endif %}
+        <div class="row-links">
+          <form method="post" action="/teacher/sets/{{ qset.id }}/questions/{{ q.id }}/move"><input type="hidden" name="direction" value="up"><button class="text">Up</button></form>
+          <form method="post" action="/teacher/sets/{{ qset.id }}/questions/{{ q.id }}/move"><input type="hidden" name="direction" value="down"><button class="text">Down</button></form>
+          <form method="post" action="/teacher/sets/{{ qset.id }}/questions/{{ q.id }}/toggle"><button class="text">{% if q.visible %}Hide{% else %}Show{% endif %}</button></form>
+          <form method="post" action="/teacher/sets/{{ qset.id }}/questions/{{ q.id }}/delete"><button class="text danger">Delete</button></form>
+        </div>
+      </li>
+      {% else %}
+      <li>No questions yet. Import a file or add one below.</li>
+      {% endfor %}
+    </ol>
+  </section>
+
+  <section>
+    <h2>Add one question</h2>
+    <form method="post" action="/teacher/sets/{{ qset.id }}/questions" class="stack">
+      <label>Prompt <textarea name="prompt" rows="2" required></textarea></label>
+      <label>Type
+        <select name="type">
+          <option value="mcq">Multiple choice</option>
+          <option value="true_false">True / false</option>
+          <option value="short">Short text</option>
+        </select>
+      </label>
+      <div class="choice-grid">
+        <input name="choice_a" placeholder="A">
+        <input name="choice_b" placeholder="B">
+        <input name="choice_c" placeholder="C">
+        <input name="choice_d" placeholder="D">
+        <input name="choice_e" placeholder="E">
+      </div>
+      <label>Correct (A–E, true/false, or exact short text; blank = survey)
+        <input name="correct" placeholder="B">
+      </label>
+      <label>Points <input name="points" type="number" step="0.5" value="1"></label>
+      <button type="submit">Add question</button>
+    </form>
+  </section>
+</main>
+{% endblock %}
