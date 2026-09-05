@@ -2,7 +2,23 @@
 
 A teacher-owned **Quick Response System** for live classes. Students join from their phones with a QR code, **must enter a student number before any question is shown**, and can sit in different subclasses while answering the **same question set**.
 
-This is a standalone replica of the HSU QRS classroom flow, with a stricter identity gate and proper import/export so you can run it for your own teaching without campus SSO.
+Hosted on **Cloudflare Workers + D1** so phones can join from anywhere. A local Python app remains available for offline classroom use.
+
+## Host on Cloudflare (recommended)
+
+```bash
+npm install
+cp .dev.vars.example .dev.vars   # local secret only
+npx wrangler types
+npx wrangler d1 migrations apply teachqrs --local
+npx wrangler d1 migrations apply teachqrs --remote
+npx wrangler secret put TEACHQRS_SECRET    # paste a long random string
+npx wrangler deploy
+```
+
+Then open `https://teachqrs.<your-subdomain>.workers.dev/teacher`. First visit sets the teacher password. Put the live projector URL on screen; students scan the QR.
+
+Local Cloudflare preview: `npx wrangler dev` then http://127.0.0.1:8787/teacher
 
 ## What it does
 
@@ -12,19 +28,18 @@ This is a standalone replica of the HSU QRS classroom flow, with a stricter iden
 - Import questions from **CSV or Excel**; export the set the same way
 - Export responses as **CSV** (student number, subclass, answer, correctness, round, timestamps)
 
-## Run
+## Run locally (Python, optional)
 
 Python 3.11+.
 
 ```bash
-cd teachqrs
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python -m app
 ```
 
-Open [http://127.0.0.1:8765/teacher](http://127.0.0.1:8765/teacher). First visit sets a local teacher password. The projector QR uses your LAN address when you open the live view as `localhost`, so phones on classroom Wi-Fi can join.
+Open [http://127.0.0.1:8765/teacher](http://127.0.0.1:8765/teacher). First visit sets a local teacher password. The projector QR uses your LAN address when you open the live view as `localhost`, so phones on classroom Wi‑Fi can join.
 
 Default bind: `0.0.0.0:8765`. Override with `TEACHQRS_HOST` / `TEACHQRS_PORT`. Database file: `data/teachqrs.db` (gitignored).
 
