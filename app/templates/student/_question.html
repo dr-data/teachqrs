@@ -1,0 +1,24 @@
+<article class="qcard">
+  <p class="eyebrow">Question {{ q.position }}</p>
+  <h2>{{ q.prompt }}</h2>
+  <form method="post" action="/j/{{ session.join_code }}/answer">
+    <input type="hidden" name="question_id" value="{{ q.id }}">
+    {% if q.type == 'mcq' %}
+      {% for c in q.choices %}
+        {% set letter = "ABCDE"[loop.index0] %}
+        <label class="choice">
+          <input type="radio" name="value" value="{{ letter }}" {% if answers.get(q.id) and answers[q.id].value == letter %}checked{% endif %} {% if session.mode == 'interactive' and not session.collecting %}disabled{% endif %} required>
+          <span>{{ letter }}. {{ c }}</span>
+        </label>
+      {% endfor %}
+    {% elif q.type == 'true_false' %}
+      <label class="choice"><input type="radio" name="value" value="true" {% if answers.get(q.id) and answers[q.id].value == 'true' %}checked{% endif %} {% if session.mode == 'interactive' and not session.collecting %}disabled{% endif %} required> True</label>
+      <label class="choice"><input type="radio" name="value" value="false" {% if answers.get(q.id) and answers[q.id].value == 'false' %}checked{% endif %} {% if session.mode == 'interactive' and not session.collecting %}disabled{% endif %} required> False</label>
+    {% else %}
+      <input name="value" value="{{ answers[q.id].value if answers.get(q.id) else '' }}" {% if session.mode == 'interactive' and not session.collecting %}disabled{% endif %} required>
+    {% endif %}
+    <button type="submit" {% if session.mode == 'interactive' and not session.collecting %}disabled{% endif %}>
+      {% if answers.get(q.id) %}Update answer{% else %}Submit answer{% endif %}
+    </button>
+  </form>
+</article>

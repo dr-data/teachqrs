@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}TeachQRS{% endblock %}
+{% block body_class %}page-home{% endblock %}
+{% block body %}
+<main class="shell">
+  <p class="eyebrow">Classroom quick response</p>
+  <h1>TeachQRS</h1>
+  <p class="lede">Join with the 4-character code on the projector. Your student number is required before any question appears.</p>
+  <form class="join-box" method="post" action="/join">
+    <label for="code">Join code</label>
+    <input id="code" name="code" maxlength="8" autocapitalize="characters" autocomplete="off" required>
+    <button type="submit">Join session</button>
+  </form>
+  <p class="fine"><a href="/teacher">Teacher login</a></p>
+</main>
+{% endblock %}

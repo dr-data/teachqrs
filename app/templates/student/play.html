@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Questions{% endblock %}
+{% block body_class %}page-phone{% endblock %}
+{% block body %}
+<main class="phone" data-code="{{ session.join_code }}" data-qid="{{ session.current_question_id }}" data-round="{{ session.current_round }}" data-collecting="{{ session.collecting }}">
+  <p class="eyebrow">{{ student_number }} · {{ session.join_code }} · round {{ session.current_round }}</p>
+  {% if flash %}<p class="flash {% if flash.e %}bad{% endif %}">{{ flash.m }}</p>{% endif %}
+
+  {% if session.mode == 'interactive' %}
+    {% for q in questions if q.id == session.current_question_id %}
+      {% include "student/_question.html" %}
+    {% else %}
+      <p class="lede">Waiting for the next question.</p>
+    {% endfor %}
+    {% if not session.collecting %}
+      <p class="hint">Answering is closed. Wait for the teacher to reopen or move on.</p>
+    {% endif %}
+  {% else %}
+    {% for q in questions %}
+      {% include "student/_question.html" %}
+    {% endfor %}
+  {% endif %}
+</main>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/student.js"></script>
+{% endblock %}
