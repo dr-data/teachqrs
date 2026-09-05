@@ -1,0 +1,4 @@
+question_number,prompt,type,choice_a,choice_b,choice_c,choice_d,choice_e,correct,points
+1,"Which quantity is conserved in an isolated mechanical system with no non-conservative work?",mcq,Momentum only,Mechanical energy,Temperature,Charge density,,B,1
+2,"A larger sample size always removes bias from a poorly designed survey.",true_false,,,,,false,1
+3,"Name one reason a classroom clicker question is more useful after a short peer discussion.",short,,,,,,1
